@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Multiplication Table Pro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f4f8;
+            transition: background 0.3s, color 0.3s;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 10px;
+            margin: 5px;
+            width: 80px;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .table-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .table-box {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 10px;
+            padding: 10px;
+            width: 180px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease-in;
+            position: relative;
+        }
+        .table-box h3 {
+            text-align: center;
+            color: #007bff;
+        }
+        .table-box p {
+            text-align: center;
+            margin: 5px 0;
+            transition: background 0.2s;
+        }
+        .table-box p:hover {
+            background: #e0f7fa;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+        .dark-mode {
+            background: #121212;
+            color: #f0f0f0;
+        }
+        .dark-mode .table-box {
+            background: #1e1e1e;
+            border: 1px solid #333;
+        }
+        .fun-fact {
+            text-align: center;
+            margin-top: 30px;
+            font-style: italic;
+            color: #555;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Smart Multiplication Table Pro 🚀</h1>
+
+    <div class="controls">
+        <input type="number" id="startNumber" placeholder="Tangirira kuri...">
+        <input type="number" id="endNumber" placeholder="Gera kuri...">
+        <input type="number" id="searchNumber" placeholder="Shaka muri table...">
+        <br>
+        <button onclick="generateTable()">Generate Table</button>
+        <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+        <button onclick="searchInTables()">Search</button>
+    </div>
+
+    <div class="table-container" id="tableContainer"></div>
+
+    <div class="fun-fact" id="funFact"></div>
+
+    <script>
+        const colors = ['#ffadad', '#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#a0c4ff', '#bdb2ff', '#ffc6ff'];
+
+        function generateTable() {
+            const start = parseInt(document.getElementById('startNumber').value);
+            const end = parseInt(document.getElementById('endNumber').value);
+            const container = document.getElementById('tableContainer');
+
+            container.innerHTML = '';
+
+            if (isNaN(start) || isNaN(end) || start > end) {
+                alert('Shyiramo imibare yemewe kandi tangirira kuri number nto cyangwa ingana na end.');
+                return;
+            }
+
+            let colorIndex = 0;
+            for (let i = start; i <= end; i++) {
+                const tableBox = document.createElement('div');
+                tableBox.className = 'table-box';
+                tableBox.style.background = colors[colorIndex % colors.length];
+                
+                const title = document.createElement('h3');
+                title.textContent = `Table of ${i}`;
+                tableBox.appendChild(title);
+
+                const copyBtn = document.createElement('button');
+                copyBtn.textContent = '📋';
+                copyBtn.className = 'copy-btn';
+                copyBtn.onclick = () => copyTable(i);
+                tableBox.appendChild(copyBtn);
+
+                let tableText = `Table of ${i}\n`;
+                for (let j = 1; j <= 12; j++) {
+                    const row = document.createElement('p');
+                    row.textContent = `${i} x ${j} = ${i * j}`;
+                    tableBox.appendChild(row);
+                    tableText += `${i} x ${j} = ${i * j}\n`;
+                }
+                tableBox.dataset.tableText = tableText;
+
+                container.appendChild(tableBox);
+                colorIndex++;
+            }
+
+            // Fun fact
+            const facts = [
+                'Did you know? Multiplying any number by 9 and adding the digits always equals 9!',
+                'Tip: The table of 5 always ends with 0 or 5.',
+                'Fun: 12 x 12 is 144, a magic number in math!',
+            ];
+            document.getElementById('funFact').textContent = facts[Math.floor(Math.random() * facts.length)];
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        function copyTable(number) {
+            const tables = document.querySelectorAll('.table-box');
+            tables.forEach(table => {
+                if (table.querySelector('h3').textContent.includes(number)) {
+                    navigator.clipboard.writeText(table.dataset.tableText);
+                    alert(`Table of ${number} copied to clipboard!`);
+                }
+            });
+        }
+
+        function searchInTables() {
+            const searchNumber = parseInt(document.getElementById('searchNumber').value);
+            const tables = document.querySelectorAll('.table-box');
+            tables.forEach(table => {
+                const rows = table.querySelectorAll('p');
+                let found = false;
+                rows.forEach(row => {
+                    if (row.textContent.includes(searchNumber)) {
+                        row.style.background = '#ffe066';
+                        found = true;
+                    } else {
+                        row.style.background = 'transparent';
+                    }
+                });
+                if (!found) {
+                    table.style.opacity = '0.5';
+                } else {
+                    table.style.opacity = '1';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
